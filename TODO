@@ -1,0 +1,6 @@
+# Plan:
+- [ ] Build MCTS with random rollouts. A search agent that already plays well by simulating thousands of random games from each position
+- [ ] Generate training data. Let the strong MCTS agent play 2,000 games against itself. Save every board state and who eventually won
+- [ ] Train a neural net. Teach a small PyTorch network to predict 'who is winning from this position' using the MCTS game data
+- [ ] Replace rollout with net. Instead of random simulation, MCTS now asks the net to evaluate positions: potentially much faster and smarter
+- [ ] Compare & analyse. Does MCTS+net beat pure MCTS? Why or why not? This analysis IS the interesting part of the report

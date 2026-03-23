@@ -1,0 +1,19 @@
+# ----- learning notes -----
+How MCTS works: https://www.youtube.com/watch?v=lhFXKNyA0QA
+MCTS: 4 phase algorithm (cycle) https://www.geeksforgeeks.org/machine-learning/monte-carlo-tree-search-mcts-in-machine-learning/
+
+1. Selection:
+- start at root node
+- move down tree using selection rule: Upper Confidence Bound (UCB1): https://www.geeksforgeeks.org/machine-learning/upper-confidence-bound-algorithm-in-reinforcement-learning/
+2. Expansion: 
+3. Simulation: 
+4. Backpropogation: 
+
+- node with the most number of simulations is typically what to choose (not highest win rate) because UCB1 chooses the most (uct for tree).
+
+
+# ----- general notes -----
+- Looking at a tic-tac-toe example to learn project structure may be helpful.
+- MCTS (Monte Carlo Tree Search): heuristic search algorithm: trees.
+- Neural net value function: approximates the expected cumulative reward from a given state in reinforcement learning, mapping states to scalar values.
+- Connect Four: 6 rows, 7 columns.
