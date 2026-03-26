@@ -47,7 +47,7 @@ class Board:
             self.gameboard[0][i] = -1'''
         # -----
 
-        self.player_turn = 1 # 1 and -1.
+        self.player_turn = 1 # 1 and -1. to train NN, can do: board *= -1 (player turn doesn't matter when training nn).
         self.last_played = [None, None]
 
     # TODO: might not need all of these, we will see
