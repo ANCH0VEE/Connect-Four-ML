@@ -23,3 +23,6 @@
     - a basic idea of how player turns will work
     - some other rough restructuring
 
+# 3/25/2026
+- Group meeting
+- review and clarification of MCTS
