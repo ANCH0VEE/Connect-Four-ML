@@ -9,6 +9,7 @@ import random
 # turns: player = -player
 
 class Board:
+    
     # wins : TODO: replace with more efficient search algorithm based around last move made by certain player.
     #        just iterate and directly use the index instead
     """vertical_win = [
@@ -35,7 +36,7 @@ class Board:
     def __init__(self):
         #self.gameboard = np.zeros((7,6), dtype=np.int8) # coordinates for np array: (row number, row index).
         self.gameboard = torch.zeros((7, 6), dtype=torch.int8)
-
+        self.movesPlayed = 0; 
         # ----- testing: delete this after
         height = 6
         for i in range (6):
@@ -80,6 +81,7 @@ class Board:
     # TODO: make sure to check, before calling this method, whether col is valid (still has open space).
     #       or instead, do we check inside the method itself?
     def place_move(self, player_turn, col):
+        self.movesPlayed+=1
         coords = self.find_next_in_col(col)
         self.gameboard[coords[0]][coords[1]] = player_turn
         self.last_played = coords
@@ -93,13 +95,28 @@ class Board:
     # TODO: for efficiency, check around last placed piece: "search algorithm"
     def check_win_state(self, game_state, last_coord):
         # from previous move (coordinate), get all pieces of same player that are touching previous move horizontally, vertically, or diagonally.
-        last_id = game_state[last_coord[0]][last_coord[1]]
-        for i in range (4):
-            pass
+        
+        color = self.get_last_player # returns 1 if red, -1 if yellow
+
+        x = self.last_played[0]
+        y = self.last_played[1]
+
+        #check horizontal
+        
+        '''
+        for i in range (6):
+            for j in range (4): 
+                if (i+j > )
+                chip = self.full_board[i+j][y] # check for existance first
+                if (chip != color): 
+                     break
+            return True
+        '''
+        return
 
     # TODO: game board full as one of first checks in game loop
     def full_board(self):
-        pass
+        return self.movesPlayed == 42
 
 
     def print_info(self):
@@ -126,3 +143,10 @@ for i in range(2):
 
 for i in range(10):
     b.place_random_move(b.player_turn)
+
+
+
+
+print (b.gameboard)
+print (b.gameboard[0])
+print (b.gameboard[0][1])
