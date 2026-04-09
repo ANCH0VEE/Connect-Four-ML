@@ -8,50 +8,43 @@ import random
 # player IDs: 0: empty space; 1: player 1 space; -1: player 2 space.
 # turns: player = -player
 
+# IMPORTANT: pretend that connect four is 7x6, and we insert pieces from the left and they fall to the right.
 class Board:
-    
-    # wins : TODO: replace with more efficient search algorithm based around last move made by certain player.
-    #        just iterate and directly use the index instead
-    """vertical_win = [
-        '''(0,0),'''
-        (1,0),
-        (2,0),
-        (3,0)
-    ]
-    horizontal_win = [
-        '''(0,0),'''(0,1),(0,2),(0,3)
-    ]
-    TL_BR_win = [
-        '''(0,0),'''
-            (1,1),
-                (2,2),
-                    (3,3)
-    ]
-    BR_TL_win = [
-                    (-3,3),
-                (-2,2),
-            (-1,1),
-        '''(0,0)''' 
-    ]"""
     def __init__(self):
         #self.gameboard = np.zeros((7,6), dtype=np.int8) # coordinates for np array: (row number, row index).
         self.gameboard = torch.zeros((7, 6), dtype=torch.int8)
         self.movesPlayed = 0; 
-        # ----- testing: delete this after
-        height = 6
-        for i in range (6):
-            for j in range (height):
-                self.gameboard[i][-j-1] = 1
-            height -=1
-
-        '''for i in range (4):
-            self.gameboard[0][i] = -1'''
-        # -----
 
         self.player_turn = 1 # 1 and -1. to train NN, can do: board *= -1 (player turn doesn't matter when training nn).
         self.last_played = [None, None]
 
-    # TODO: might not need all of these, we will see
+        # dummy board ---
+        '''height = 6
+        for i in range (6):
+            for j in range (height):
+                self.gameboard[i][-j-1] = 1
+            height -=1'''
+        
+        # -----
+        '''for i in range (4):
+            for i in range (4):
+                self.place_move(self.get_current_player(), i)'''
+        
+        # list of columns in which moves are placed, in order by index. alternates between players 1 and -1.
+        # tests
+        horizontal_test_move_sequence= [0,6,1,6,2,6,3]
+        vertical_test_move_sequence= [0,6,0,5,0,4,0]
+        diagonal_test_move_sequence_TLBR = [0,1,2,3,4,0,1,2,2,3,3,6,3]
+        diagonal_test_move_sequence_BLTR = [0,1,2,3,4,0,1,2,4,3,2,3,3]
+        #self.test_sequence_of_moves(diagonal_test_move_sequence_TLBR)
+            
+        # -----------------
+
+    def test_sequence_of_moves(self, list):
+        for col in list:
+            self.place_move(self.get_current_player(), col)
+
+    # might not need all of these, we will see
     def get_current_player(self): # 1 and -1
         return self.player_turn
     def switch_current_player(self):
@@ -86,38 +79,68 @@ class Board:
         self.gameboard[coords[0]][coords[1]] = player_turn
         self.last_played = coords
         self.switch_current_player()
-        self.print_info()
+        #self.print_info()
 
     def place_random_move(self, player_turn):
         rand_col = random.choice(self.get_all_possible_moves())[0] # automatically filters out invalid cols
         self.place_move(player_turn, rand_col)
 
-    # TODO: for efficiency, check around last placed piece: "search algorithm"
-    def check_win_state(self, game_state, last_coord):
+    def check_win_state(self, game_state, coords):
+        if coords[0] == None: return False # this is for empty board check, when no moves have been made yet
         # from previous move (coordinate), get all pieces of same player that are touching previous move horizontally, vertically, or diagonally.
-        
-        color = self.get_last_player # returns 1 if red, -1 if yellow
+        color = self.get_last_player() # returns 1 if red, -1 if yellow
+        # (x,y) is the last played move by color
+        x = coords[0] # row
+        y = coords[1] # col
 
-        x = self.last_played[0]
-        y = self.last_played[1]
-
-        #check horizontal
-        
-        '''
-        for i in range (6):
-            for j in range (4): 
-                if (i+j > )
-                chip = self.full_board[i+j][y] # check for existance first
-                if (chip != color): 
-                     break
+        # check horizontal
+        consecutive_color = 1
+        for direction in [1,-1]:
+            i = 1 # magnitude of offset from last played chip ("middle")
+            #                           v  meaning 6th item 
+            while (0 <= y+direction*i <= 5 and game_state[x][y+direction*i] == color):
+                consecutive_color +=1
+                i+=1
+        if consecutive_color >= 4:
             return True
-        '''
-        return
+        
+        # check vertical
+        consecutive_color = 1
+        for direction in [-1,1]:
+            i = 1
+            while (0 <= x+direction*i <= 6 and game_state[x+direction*i][y] == color):
+                consecutive_color +=1
+                i+=1
+        if consecutive_color >= 4:
+            return True
+        
+        # check diagonal (1)
+        num_in_a_row = 1
+        for direction in [-1,1]:
+            i = 1
+            while (0 <= y+direction*i <= 5 and 0 <= x+direction*i <= 6
+                   and game_state[x+direction*i][y+direction*i] == color):
+                num_in_a_row +=1
+                i+=1
+        if num_in_a_row >= 4:
+            return True
+        
+        # check diagonal (2)
+        num_in_a_row = 1
+        for direction in [-1,1]:
+            i = 1
+            while (0 <= y-direction*i <= 5 and 0 <= x+direction*i <= 6
+                   and game_state[x+direction*i][y-direction*i] == color):
+                num_in_a_row +=1
+                i+=1
+        if num_in_a_row >= 4:
+            return True
 
-    # TODO: game board full as one of first checks in game loop
+        # no 4 in a row
+        return False
+
     def full_board(self):
         return self.movesPlayed == 42
-
 
     def print_info(self):
         print('v top left side')
@@ -128,25 +151,46 @@ class Board:
         print("\n transpose: proper game board display")
         print(self.gameboard.T)
 
-        print("all possible moves left: ", b.get_all_possible_moves())
+        print("all possible moves left: ", self.get_all_possible_moves())
         print(f"player {self.get_last_player()} just played {self.last_played}")
         print("---------------------------")
 
+    # main game loop
     def main(self):
-        pass
+        end_game = False
+        winner = None
+        while (end_game == False):
+            if (self.full_board() == True):
+                end_game = True
+                break
+
+            print(self.gameboard.T)
+            while True:
+                try: # keep prompting user until input is 0-6 and that the column has space available (not full col)
+                    col = int(input(f"player {self.get_current_player()} turn: insert into column with space (0-6): "))
+                    if 0 <= col <= 6 and self.find_next_in_col(col) != None:
+                        break
+                except ValueError:
+                    pass
+
+            self.place_move(self.get_current_player(), col)
+
+            if (self.check_win_state(self.gameboard, self.last_played) == True):
+                end_game = True
+                winner = self.get_last_player()
+
+            print("four in a row:", self.check_win_state(self.gameboard, self.last_played))
+            print("--------------------")
+            #self.print_info()
+
+        if (winner == None):
+            print("IT'S A TIE!")
+            print(self.gameboard.T)
+        else:
+            print("FOUR IN A ROW!")
+            print(self.gameboard.T)
+            print(f"WINNER:", winner)
 
 b = Board()
-
-b.print_info()
-for i in range(2):
-    b.place_move(b.player_turn, 2)
-
-for i in range(10):
-    b.place_random_move(b.player_turn)
-
-
-
-
-print (b.gameboard)
-print (b.gameboard[0])
-print (b.gameboard[0][1])
+if __name__ == "__main__":
+    b.main()

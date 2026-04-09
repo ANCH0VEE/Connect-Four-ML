@@ -26,3 +26,20 @@
 # 3/25/2026
 - Group meeting
 - review and clarification of MCTS
+
+# 4/1/2026
+- Group meeting
+- Welcome to the group, Nick
+- Continue building game state logic:
+    - full_board: board is filled when there are 6*7 = 42 chips inserted. Returns if a counter that is incremented with every move played is equal to 42.
+    - discussed how we can build method: check_win_state
+        - solutions: take last played move. either: 
+            a. check all possible groups of 4 around that coordinate, horizontally, vertically, and diagonally.
+            b. use a counter to keep track of the number of same colored pieces in a row by expanding outwards in both directions from the last played move.
+        - make sure to handle edge-of-board cases. access only existing coordinates.
+
+# 4/8/2026
+- Group meeting
+- All fundamental game logic finished:
+    - check win state method complete: horizontal, vertical, and both diagonals
+- Created playable game in terminal, putting all logic together for future convenience.

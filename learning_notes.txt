@@ -8,6 +8,7 @@ Upper Confidence Bound (UCB1): https://www.geeksforgeeks.org/machine-learning/up
 3. Simulation
 4. Backpropogation
 
+
 # ----- general notes -----
 - Looking at a tic-tac-toe example to learn project structure may be helpful.
 - MCTS (Monte Carlo Tree Search): heuristic search algorithm: trees.
