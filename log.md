@@ -43,3 +43,11 @@
 - All fundamental game logic finished:
     - check win state method complete: horizontal, vertical, and both diagonals
 - Created playable game in terminal, putting all logic together for future convenience.
+
+# 4/15/2026 - 4/16/2026
+- Group meeting
+- mcts module
+- MCTS_Node class
+- Slightly generalized Board class method parameters and structure to be used in MCTS_Node class.
+- Playable bot, although still misses easy wins and misses blocking player wins. 
+- next: organization, add heuristics and neural net.

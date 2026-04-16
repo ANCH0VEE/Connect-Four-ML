@@ -1,6 +1,7 @@
 import math
 import random
 from copy import deepcopy
+from mcts import MCTS_Node
 
 BOARD_SIZE = 3
 
@@ -54,6 +55,7 @@ class MCTSNode:
         child = MCTSNode(new_state, parent=self, action=action, player=player_to_move)
         self.children.append(child)
         return child
+    
     def best_child(self, c=1.4):
         for child in self.children:
             if child.visits == 0:
@@ -66,7 +68,7 @@ class MCTSNode:
 
         return max(self.children, key=ucb)
     
-    def rollout(self):
+    def rollout(self): # rollout is simulation phase
         state = deepcopy(self.state)
         player = get_current_player(state)
 
