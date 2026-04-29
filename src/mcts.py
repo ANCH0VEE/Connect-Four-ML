@@ -9,7 +9,7 @@ class MCTS_Node:
     # perform all four phases of MCTS to (hopefully) find the best move
     def MCTS_search(game, iterations):
         #                                                  get last player (1, person), because we want current move decision.
-        root = MCTS_Node(game, game.gameboard, None, None, game.get_last_player())
+        root = MCTS_Node(game, game.board, None, None, game.get_last_player())
 
         # perform all iteration of MCTS, grow the tree.
         for i in range (iterations):
@@ -34,11 +34,11 @@ class MCTS_Node:
 
     def __init__(self, game, state, parent, action, player):
         self.game = game # reference to game
+        self.state = state
         self.parent = parent # parent node
         self.action = action # (x,y)
         self.player = player # which player turn
 
-        self.state = deepcopy(state) # COPY of game state
         self.children = [] # children of this node
         self.visits = 0
         self.wins = 0.0
@@ -75,7 +75,9 @@ class MCTS_Node:
     # expansion phase: we are at a leaf node in the current tree: choose and add a child for the leaf.
     def expand(self): # expansion phase
         # pop to remove from untried actions.
-        action = self.untried_actions.pop() # although apparently doesn't have to be random?
+        action = random.choice(self.untried_actions) # random
+        self.untried_actions.remove(action) 
+
         new_state = deepcopy(self.state) # create a brand new state to put into a new MCTS_Node object: do not want to change the one for current node.
         next_player = -self.player
         new_state[action[0]][action[1]] = next_player

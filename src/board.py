@@ -1,6 +1,6 @@
-#import numpy as np
 import torch
 import torch.nn
+import pygame
 
 from mcts import MCTS_Node
 
@@ -10,12 +10,16 @@ from mcts import MCTS_Node
 
 # IMPORTANT: pretend that connect four is 7x6, and we insert pieces from the left and they fall to the right.
 class Board:
-    def __init__(self):
-        self.gameboard = torch.zeros((7, 6), dtype=torch.int8)
+    def __init__(self, game):
+        self.game = game
+        self.board = torch.zeros((7, 6), dtype=torch.int8)
         self.moves_played = 0; 
 
         self.player_turn = 1 # 1 and -1. to train NN, can do: board *= -1 (player turn doesn't matter when training nn).
         self.last_played = None
+
+        self.red = []
+        self.yellow = []
 
     # might not need all of these, we will see
     def get_current_player(self): # 1 and -1
@@ -43,24 +47,30 @@ class Board:
             available_moves.append(move) if move != None else None
         return available_moves
 
+    # current player places piece in column
     def place_move(self, game_state, player_turn, col):
         self.moves_played+=1
         coords = self.find_next_in_col(game_state, col)
+
+        # add to lists
+        if self.get_current_player() == -1: self.yellow.append(coords)
+        else: self.red.append(coords)
+
         game_state[coords[0]][coords[1]] = player_turn
         self.last_played = coords
         self.switch_current_player()
-        #self.print_info()
 
+    # place a random move
     '''def place_random_move(self, game_state, player_turn):
         rand_col = random.choice(self.get_all_possible_moves(game_state))[0] # automatically filters out invalid cols
         self.place_move(player_turn, rand_col)'''
 
+    # returns if a player has won, based on last move played.
+    # from previous move (coordinate), get all pieces of same player that are touching previous move horizontally, vertically, or diagonally.
     def check_win_state(self, game_state, coords):
         if coords == None:
             return False # this is for empty board check, when no moves have been made yet
-        # from previous move (coordinate), get all pieces of same player that are touching previous move horizontally, vertically, or diagonally.
-        #color = self.get_last_player() # returns 1 if red, -1 if yellow
-        #color = state[x][y]
+
         # (x,y) is the last played move by color
         x = coords[0] # row
         y = coords[1] # col
@@ -114,62 +124,3 @@ class Board:
 
     def full_board(self):
         return self.moves_played == 42
-
-    '''def print_info(self):
-        print('v top left side')
-        print(self.gameboard)
-        print('^ top right side')
-
-        # matrix transpose for proper view.
-        print("\n transpose: proper game board display")
-        print(self.gameboard.T)
-
-        print("all possible moves left: ", self.get_all_possible_moves(self.gameboard))
-        print(f"player {self.get_last_player()} just played {self.last_played}")
-        print("---------------------------")'''
-
-    # main game loop
-    def main(self):
-        end_game = False
-        winner = None
-        while (end_game == False):
-            if (self.full_board() == True):
-                end_game = True
-                break
-
-            print(self.gameboard.T)
-            while True:
-                col = 0
-                if self.get_current_player() == 1:
-                    try: # keep prompting user until input is 0-6 and that the column has space available (not full col)
-                        col = int(input(f"player {self.get_current_player()} turn: insert into column with space (0-6): "))
-                        if 0 <= col <= 6 and self.find_next_in_col(self.gameboard, col) != None:
-                            break
-                    except ValueError:
-                        pass
-                else:
-                    coord = MCTS_Node.MCTS_search(self, 1000)
-                    col = coord[0]
-                    break
-
-            self.place_move(self.gameboard, self.get_current_player(), col)
-
-            if (self.check_win_state(self.gameboard, self.last_played) == True):
-                end_game = True
-                winner = self.get_last_player()
-
-            print("four in a row:", self.check_win_state(self.gameboard, self.last_played))
-            print("--------------------")
-            #self.print_info()
-
-        if (winner == None):
-            print("IT'S A TIE!")
-            print(self.gameboard.T)
-        else:
-            print("FOUR IN A ROW!")
-            print(self.gameboard.T)
-            print(f"WINNER:", winner)
-
-game = Board()
-if __name__ == "__main__":
-    game.main()
