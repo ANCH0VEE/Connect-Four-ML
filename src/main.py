@@ -135,18 +135,18 @@ class Game:
                     self.board.place_move(self.board.board, self.board.get_current_player(), col)
 
         elif self.board.get_current_player() == -1: # machine
-            # start threading only once
-            if self.machine_started == False:
-                self.machine_started = True
-                self.machine_move = None
+                # start threading only once
+                if self.machine_started == False:
+                    self.machine_started = True
+                    self.machine_move = None
+                    if (self.board.easy_win_heuristic() == False):
+                        threading.Thread(target=self.thread_process,daemon=True).start()
 
-                threading.Thread(target=self.thread_process,daemon=True).start()
+                # make move
+                if self.machine_move != None:
+                    col = self.machine_move[0]
 
-            # make move
-            if self.machine_move != None:
-                col = self.machine_move[0]
-
-                self.board.place_move(self.board.board, -1, col)
+                    self.board.place_move(self.board.board, -1, col)
 
                 self.machine_move = None
                 self.machine_started = False

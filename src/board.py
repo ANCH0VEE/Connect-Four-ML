@@ -1,6 +1,7 @@
 import torch
 import torch.nn
 import pygame
+from copy import deepcopy
 
 from mcts import MCTS_Node
 
@@ -38,6 +39,15 @@ class Board:
             return [col, next_spot]
         return None
     
+    # returns columns (indices) with open moves
+    '''def find_open_cols(self, game_state):
+        open_cols = []
+        for i in range (7):
+            zero_indices = torch.nonzero(game_state[i] == 0).squeeze(1) # a tuple
+            if (zero_indices.numel() > 0):
+                open_cols.append(i)
+        return open_cols'''
+        
     # return grid coordinates. any completely filled column will not have a possible move in that column.
     def get_all_possible_moves(self, game_state):
         available_moves = []
@@ -124,3 +134,15 @@ class Board:
 
     def full_board(self):
         return self.moves_played == 42
+    
+    # heuristics
+    def easy_win_heuristic(self):
+        check_moves = self.get_all_possible_moves(self.board)
+        for i in range(7):
+            dummy_board = deepcopy(self.board)
+            self.place_move(dummy_board, self.get_current_player(), check_moves[i][1])
+            if (self.check_win_state(dummy_board, check_moves[i]) == True):
+                self.place_move(self.board, self.get_current_player(), i)
+                print("easy win found")
+                return True
+        return False
