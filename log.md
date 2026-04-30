@@ -51,3 +51,14 @@
 - Slightly generalized Board class method parameters and structure to be used in MCTS_Node class.
 - Playable bot, although still misses easy wins and misses blocking player wins. 
 - next: organization, add heuristics and neural net.
+
+# 4/16/2026 - ?
+- pygame gui
+- threading for mcts search (it can be slow)
+
+# 4/29/2026
+- Group meeting
+- Implemented one move win and block heuristics.
+- Replayable game: press r.
+- May have suble bugs. Need more testing.
+- Started slideshow presentation: presentations and judging next week (Wednesday 5/6/2026).

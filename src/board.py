@@ -136,13 +136,25 @@ class Board:
         return self.moves_played == 42
     
     # heuristics
-    def easy_win_heuristic(self):
+    # easy win: get_current_player()
+    # easy block: get_last_player()
+
+    def one_move_heuristic(self, check):
         check_moves = self.get_all_possible_moves(self.board)
-        for i in range(7):
+        for move in check_moves:
             dummy_board = deepcopy(self.board)
-            self.place_move(dummy_board, self.get_current_player(), check_moves[i][1])
-            if (self.check_win_state(dummy_board, check_moves[i]) == True):
-                self.place_move(self.board, self.get_current_player(), i)
-                print("easy win found")
+            col = move[0] # get col
+            coords = self.find_next_in_col(dummy_board, col)
+            dummy_board[coords[0]][coords[1]] = check
+            if (self.check_win_state(dummy_board, coords) == True):
+                self.place_move(self.board, -1, col)
                 return True
         return False
+
+    # if there is a win in 1, make that move.
+    def easy_win_heuristic(self):
+        return self.one_move_heuristic(self.get_current_player())
+    
+    # if opponent has win in 1, block that move.
+    def easy_block_heuristic(self):
+        return self.one_move_heuristic(self.get_last_player())

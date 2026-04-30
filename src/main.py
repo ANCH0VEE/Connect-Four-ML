@@ -55,6 +55,9 @@ class Game:
             if event.type == pygame.MOUSEBUTTONUP:
                 if self.board.get_current_player() == 1:
                     self.player_move_made = True
+            if event.type == pygame.KEYUP:
+                if event.key == K_r:
+                    self.__init__()
 
         self.mouse_pos = pygame.mouse.get_pos()
         # get grid coordinate of mouse cursor
@@ -109,6 +112,9 @@ class Game:
             color = self.colors[player]
             self.draw_text(f"{turn} wins", (10,10), color)
 
+        self.draw_text("r: reset board", (300,10), (255,255,255))
+
+
     # render, pygame display update.
     def render(self):
         display.fill((20,20,30))
@@ -135,21 +141,22 @@ class Game:
                     self.board.place_move(self.board.board, self.board.get_current_player(), col)
 
         elif self.board.get_current_player() == -1: # machine
-                # start threading only once
-                if self.machine_started == False:
-                    self.machine_started = True
-                    self.machine_move = None
-                    if (self.board.easy_win_heuristic() == False):
-                        threading.Thread(target=self.thread_process,daemon=True).start()
+                # heuristics
+                if (self.board.easy_win_heuristic() == False):
+                    if (self.board.easy_block_heuristic() == False):
+                        # start threading only once
+                        if self.machine_started == False:
+                            self.machine_started = True
+                            self.machine_move = None
+                            threading.Thread(target=self.thread_process,daemon=True).start()
 
-                # make move
-                if self.machine_move != None:
-                    col = self.machine_move[0]
+                        # make move
+                        if self.machine_move != None:
+                            col = self.machine_move[0]
+                            self.board.place_move(self.board.board, -1, col)
 
-                    self.board.place_move(self.board.board, -1, col)
-
-                self.machine_move = None
-                self.machine_started = False
+                            self.machine_move = None
+                            self.machine_started = False
 
         # check if any player has won, based on last move played
         if (self.board.check_win_state(self.board.board, self.board.last_played) == True):
