@@ -8,4 +8,4 @@ A Connect Four game bot trained with RL, using **MCTS**(Monte Carlo tree search)
  - Abhishek Shylesh
  - Nick Zaragoza
 
-![MCTS explanation](Connect-Four_MCTS.jpg)
+![MCTS explanation](notes/Connect-Four_MCTS.jpg)
